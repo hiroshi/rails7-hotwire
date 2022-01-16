@@ -25,6 +25,10 @@ class MessagesController < ApplicationController
 
     respond_to do |format|
       if @message.save
+        format.turbo_stream do
+          @message.broadcast_append_to 'messages', target: 'messages'
+          redirect_to messages_url, notice: "Message was successfully created."
+        end
         format.html { redirect_to message_url(@message), notice: "Message was successfully created." }
         format.json { render :show, status: :created, location: @message }
       else
