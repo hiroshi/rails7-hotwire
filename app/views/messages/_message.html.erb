@@ -1,7 +1,6 @@
-<div id="<%= dom_id message %>">
+<div id="<%= dom_id message %>" class="border rounded border-black px-1 flex justify-between">
   <p>
-    <strong>Body:</strong>
     <%= message.body %>
   </p>
-
+  <%= button_to "DELETE", message, method: :delete, remote: true %>
 </div>

@@ -171,3 +171,5 @@ test:
   clients:
     default:
       database: app_test
+      hosts:
+        - mongo:27017

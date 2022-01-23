@@ -27,7 +27,7 @@ class MessagesController < ApplicationController
       if @message.save
         format.turbo_stream do
           @message.broadcast_append_to 'messages', target: 'messages'
-          redirect_to messages_url, notice: "Message was successfully created."
+          render turbo_stream: turbo_stream.update('new_message', partial: 'form', locals: { message: Message.new })
         end
         format.html { redirect_to message_url(@message), notice: "Message was successfully created." }
         format.json { render :show, status: :created, location: @message }
@@ -56,8 +56,12 @@ class MessagesController < ApplicationController
     @message.destroy
 
     respond_to do |format|
-      format.html { redirect_to messages_url, notice: "Message was successfully destroyed." }
-      format.json { head :no_content }
+      # format.html { redirect_to messages_url, notice: "Message was successfully destroyed." }
+      format.turbo_stream do
+        @message.broadcast_remove_to 'messages'
+        # Turbo::StreamsChannel.broadcast_replace_to(*streamables, target: self, **broadcast_rendering_with_defaults(rendering))
+        head :no_content
+      end
     end
   end
 

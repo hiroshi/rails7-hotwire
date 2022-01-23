@@ -2,7 +2,7 @@ require "test_helper"
 
 class MessagesControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @message = messages(:one)
+    # @message = messages(:one)
   end
 
   test "should get index" do
@@ -17,7 +17,8 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
 
   test "should create message" do
     assert_difference("Message.count") do
-      post messages_url, params: { message: { body: @message.body } }
+      # post messages_url, params: { message: { body: @message.body } }
+      post messages_url, params: { message: { body:'hello' } }
     end
 
     assert_redirected_to message_url(Message.last)
