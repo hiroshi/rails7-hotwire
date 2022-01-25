@@ -3,7 +3,7 @@ class MessagesController < ApplicationController
 
   # GET /messages or /messages.json
   def index
-    @messages = Message.all
+    @messages = messages
   end
 
   # GET /messages/1 or /messages/1.json
@@ -26,7 +26,8 @@ class MessagesController < ApplicationController
     respond_to do |format|
       if @message.save
         format.turbo_stream do
-          @message.broadcast_append_to 'messages', target: 'messages'
+          # @message.broadcast_append_to 'messages', target: 'messages'
+          Turbo::StreamsChannel.broadcast_update_to('messages', target: 'messages', partial: messages)
           render turbo_stream: turbo_stream.update('new_message', partial: 'form', locals: { message: Message.new })
         end
         format.html { redirect_to message_url(@message), notice: "Message was successfully created." }
@@ -58,8 +59,8 @@ class MessagesController < ApplicationController
     respond_to do |format|
       # format.html { redirect_to messages_url, notice: "Message was successfully destroyed." }
       format.turbo_stream do
-        @message.broadcast_remove_to 'messages'
-        # Turbo::StreamsChannel.broadcast_replace_to(*streamables, target: self, **broadcast_rendering_with_defaults(rendering))
+        # @message.broadcast_remove_to 'messages'
+        Turbo::StreamsChannel.broadcast_update_to('messages', target: 'messages', partial: messages)
         head :no_content
       end
     end
@@ -74,5 +75,9 @@ class MessagesController < ApplicationController
     # Only allow a list of trusted parameters through.
     def message_params
       params.require(:message).permit(:body)
+    end
+
+    def messages
+      @messages ||= Message.order(id: :desc).limit(5).all.reverse
     end
 end
